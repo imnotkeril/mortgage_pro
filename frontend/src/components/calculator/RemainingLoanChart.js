@@ -1,12 +1,14 @@
 import React, { useContext } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { CurrencyContext } from '../../contexts/CurrencyContext';
+import { getChartConfig } from '../../utils/chartConfig'; // Импорт конфигурации
 
 const RemainingLoanChart = ({ scheduleData, darkMode }) => {
   const { formatCurrency, getCurrencySymbol } = useContext(CurrencyContext);
   const currencySymbol = getCurrencySymbol();
-  
-  // Prepare chart data - sample every 12 months for clarity
+  const chartConfig = getChartConfig(darkMode); // Получение конфигурации с учетом темной темы
+
+  // Подготовка данных для графика (оставить существующий код)
   const chartData = scheduleData
     .filter((_, index) => index % 12 === 0 || index === scheduleData.length - 1)
     .map(item => ({
@@ -14,25 +16,25 @@ const RemainingLoanChart = ({ scheduleData, darkMode }) => {
       remainingLoan: parseFloat(item.remainingLoan.toFixed(2)),
       year: Math.ceil(item.month / 12)
     }));
-  
-  // Color scheme
+
+  // Цветовая схема (оставить существующий код)
   const colors = darkMode ? {
-    line: '#BF9FFB',       // Purple
-    dot: '#BF9FFB',        // Purple
-    activeDot: '#ffffff',  // White
-    background: '#0D1015', // Dark background
-    text: '#D1D4DC',       // Light text
-    grid: '#2A2E39'        // Grid lines
+    line: '#BF9FFB',
+    dot: '#BF9FFB',
+    activeDot: '#ffffff',
+    background: '#0D1015',
+    text: '#D1D4DC',
+    grid: '#2A2E39'
   } : {
-    line: '#9333ea',       // Purple
-    dot: '#9333ea',        // Purple
-    activeDot: '#ffffff',  // White
-    background: '#ffffff', // White background
-    text: '#374151',       // Dark text
-    grid: '#e5e7eb'        // Grid lines
+    line: '#9333ea',
+    dot: '#9333ea',
+    activeDot: '#ffffff',
+    background: '#ffffff',
+    text: '#374151',
+    grid: '#e5e7eb'
   };
-  
-  // Custom tooltip
+
+  // Пользовательская подсказка (оставить существующий код)
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       return (
@@ -48,36 +50,24 @@ const RemainingLoanChart = ({ scheduleData, darkMode }) => {
     }
     return null;
   };
-  
+
   return (
     <div>
       <h3 className={`text-md font-medium mb-2 ${darkMode ? 'text-[#D1D4DC]' : 'text-gray-700'}`}>
         Remaining Balance
       </h3>
-      <div className="h-64 md:h-72">
+      <div className="h-80 md:h-96">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 10 }}>
+          <LineChart data={chartData} margin={chartConfig.margin}>
             <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} />
-            <XAxis 
-              dataKey="year" 
-              tick={{ fill: colors.text }} 
-              stroke={colors.grid}
-              label={{ 
-                value: 'Year', 
-                position: 'insideBottom', 
-                offset: -5, 
-                fill: colors.text 
-              }}
+            <XAxis
+              dataKey="year"
+              {...chartConfig.xAxisConfig}
             />
-            <YAxis 
-              tick={{ fill: colors.text }} 
-              stroke={colors.grid}
-              label={{ 
-                value: currencySymbol, 
-                angle: -90, 
-                position: 'insideLeft', 
-                fill: colors.text 
-              }}
+            <YAxis
+              {...chartConfig.yAxisConfig}
+              tickFormatter={chartConfig.formatLargeNumber}
+              label={chartConfig.getCurrencyLabel(currencySymbol)}
             />
             <Tooltip content={<CustomTooltip />} />
             <Line 

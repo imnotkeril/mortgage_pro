@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
-from .calculators import generate_payment_schedule
-from .forecast import forecast_property_value
+from backend.core.calculators import generate_payment_schedule
+from backend.core.forecast import forecast_property_value
 
 def calculate_rent_vs_buy(property_value, down_payment, interest_rate, loan_term_years,
                           monthly_rent, rent_growth_rate, property_growth_rate,

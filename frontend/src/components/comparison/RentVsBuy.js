@@ -694,3 +694,5 @@ const RentVsBuy = () => {
     </div>
   );
 };
+
+export default RentVsBuy;

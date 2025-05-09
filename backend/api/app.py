@@ -4,13 +4,20 @@ import pandas as pd
 import numpy as np
 import json
 
-# Import calculation modules
-from core.calculators import calculate_annuity_payment, generate_payment_schedule, calculate_total_interest, calculate_total_payments
-from core.forecast import forecast_property_value
-from core.comparison import calculate_rent_vs_buy
-from core.currency import calculate_mortgage_in_multiple_currencies, convert_currency
-from core.scenarios import (
-    calculate_early_repayment, 
+import sys
+import os
+
+# Add the parent directory of backend to Python path
+parent_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(parent_dir)
+
+# Now use the backend prefix consistently
+from backend.core.calculators import calculate_annuity_payment, generate_payment_schedule, calculate_total_interest, calculate_total_payments
+from backend.core.forecast import forecast_property_value
+from backend.core.comparison import calculate_rent_vs_buy
+from backend.core.currency import calculate_mortgage_in_multiple_currencies, convert_currency
+from backend.core.scenarios import (
+    calculate_early_repayment,
     calculate_restructuring,
     calculate_with_insurance,
     calculate_with_central_bank_rate

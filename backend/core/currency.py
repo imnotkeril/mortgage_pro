@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from .calculators import generate_payment_schedule
+from backend.core.calculators import generate_payment_schedule
 
 def convert_currency(amount, from_currency, to_currency):
     """

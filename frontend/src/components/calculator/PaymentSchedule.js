@@ -1,36 +1,41 @@
 import React, { useContext, useState } from 'react';
 import { CurrencyContext } from '../../contexts/CurrencyContext';
+import { getChartConfig } from '../../utils/chartConfig'; // Импорт конфигурации
 
 const PaymentSchedule = ({ scheduleData, showFull, darkMode }) => {
   const { formatCurrency } = useContext(CurrencyContext);
+  const chartConfig = getChartConfig(darkMode); // Получение конфигурации с учетом темы
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 12;
-  
-  // Prepare schedule data
+
+  // Подготовка данных расписания (оставить существующий код)
   let tableData = showFull
     ? [...scheduleData]
     : scheduleData.filter((_, index) => index % 12 === 0 || index === scheduleData.length - 1);
-  
-  // If showing annual data, add year information
+
+  // Если отображаются годовые данные, добавить информацию о годе
   if (!showFull) {
     tableData = tableData.map(item => ({
       ...item,
       year: Math.ceil(item.month / 12)
     }));
   }
-  
-  // Pagination
+
+  // Пагинация (оставить существующий код)
   const totalPages = Math.ceil(tableData.length / rowsPerPage);
   const startIndex = (currentPage - 1) * rowsPerPage;
   const paginatedData = tableData.slice(startIndex, startIndex + rowsPerPage);
-  
-  // Handle page change
+
+  // Обработка изменения страницы (оставить существующий код)
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= totalPages) {
       setCurrentPage(newPage);
     }
   };
-  
+
+  // Форматирование крупных чисел для таблицы
+  const formatLargeNumber = chartConfig.formatLargeNumber;
+
   return (
     <div>
       <div className="overflow-x-auto">
@@ -77,8 +82,8 @@ const PaymentSchedule = ({ scheduleData, showFull, darkMode }) => {
           </tbody>
         </table>
       </div>
-      
-      {/* Pagination */}
+
+      {/* Пагинация (оставить существующий код) */}
       {showFull && totalPages > 1 && (
         <div className="flex justify-center items-center mt-4 space-x-2">
           <button

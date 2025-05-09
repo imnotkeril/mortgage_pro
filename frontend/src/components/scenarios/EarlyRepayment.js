@@ -109,20 +109,26 @@ const EarlyRepayment = () => {
   
   // Prepare chart data - sample every 12 months for clarity
   const chartData = (earlyResults.earlySchedule.length > 0 && earlyResults.regularSchedule.length > 0)
-    ? Array.from({ length: Math.max(earlyResults.earlySchedule.length, earlyResults.regularSchedule.length) }, (_, i) => {
-        const month = i + 1;
-        const earlyData = earlyResults.earlySchedule.find(item => item.month === month);
-        const regularData = earlyResults.regularSchedule.find(item => item.month === month);
-        
-        return {
-          month,
-          year: Math.ceil(month / 12),
-          earlyRemaining: earlyData ? earlyData.remainingLoan : 0,
-          regularRemaining: regularData ? regularData.remainingLoan : 0,
-          earlyPayment: earlyData ? earlyData.earlyPayment : 0,
-          isEarlyPaymentMonth: earlyParams.earlyPayments.some(p => p.month === month)
-        };
-      }).filter((item, index) => index % 12 === 0 || index === earlyResults.regularSchedule.length - 1 || item.isEarlyPaymentMonth)
+    ? (() => {
+        // Создаем Map для быстрого доступа к данным
+        const earlyDataMap = new Map(earlyResults.earlySchedule.map(item => [item.month, item]));
+        const regularDataMap = new Map(earlyResults.regularSchedule.map(item => [item.month, item]));
+
+        return Array.from({ length: Math.max(earlyResults.earlySchedule.length, earlyResults.regularSchedule.length) }, (_, i) => {
+          const month = i + 1;
+          const earlyData = earlyDataMap.get(month);
+          const regularData = regularDataMap.get(month);
+
+          return {
+            month,
+            year: Math.ceil(month / 12),
+            earlyRemaining: earlyData ? earlyData.remainingLoan : 0,
+            regularRemaining: regularData ? regularData.remainingLoan : 0,
+            earlyPayment: earlyData ? earlyData.earlyPayment : 0,
+            isEarlyPaymentMonth: earlyParams.earlyPayments.some(p => p.month === month)
+          };
+        }).filter((item, index) => index % 12 === 0 || index === earlyResults.regularSchedule.length - 1 || item.isEarlyPaymentMonth)
+      })()
     : [];
   
   // Color scheme
@@ -145,6 +151,44 @@ const EarlyRepayment = () => {
   // Custom tooltip
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
+      // Проверяем условие для отображения разницы
+      if (payload[0]?.payload?.earlyRemaining && payload[0]?.payload?.regularRemaining) {
+        const diff = payload[0].payload.regularRemaining - payload[0].payload.earlyRemaining;
+        if (diff > 0) {
+          return (
+            <div className={`p-2 border rounded shadow ${darkMode ? 'bg-[#141418] border-[#2A2E39]' : 'bg-white border-gray-200'}`}>
+              <p className="text-sm font-medium">Year {label}</p>
+              {[...payload].map((entry, index) => {
+                if (entry.dataKey === 'earlyRemaining') {
+                  return (
+                    <p key={index} className="text-sm" style={{ color: entry.color }}>
+                      Early Repayment Balance: {formatCurrency(entry.value)}
+                    </p>
+                  );
+                } else if (entry.dataKey === 'regularRemaining') {
+                  return (
+                    <p key={index} className="text-sm" style={{ color: entry.color }}>
+                      Standard Balance: {formatCurrency(entry.value)}
+                    </p>
+                  );
+                } else if (entry.dataKey === 'earlyPayment' && entry.value > 0) {
+                  return (
+                    <p key={index} className="text-sm" style={{ color: colors.payment }}>
+                      Early Payment: {formatCurrency(entry.value)}
+                    </p>
+                  );
+                }
+                return null;
+              })}
+              <p className="text-sm font-medium mt-1" style={{ color: colors.payment }}>
+                Savings: {formatCurrency(diff)}
+              </p>
+            </div>
+          );
+        }
+      }
+
+      // Стандартное отображение, если условие выше не выполнено
       return (
         <div className={`p-2 border rounded shadow ${darkMode ? 'bg-[#141418] border-[#2A2E39]' : 'bg-white border-gray-200'}`}>
           <p className="text-sm font-medium">Year {label}</p>
@@ -170,41 +214,6 @@ const EarlyRepayment = () => {
             }
             return null;
           })}
-          
-          if (payload[0]?.payload?.earlyRemaining && payload[0]?.payload?.regularRemaining) {
-            const diff = payload[0].payload.regularRemaining - payload[0].payload.earlyRemaining;
-            if (diff > 0) {
-              return (
-                <>
-                  {[...payload].map((entry, index) => {
-                    if (entry.dataKey === 'earlyRemaining') {
-                      return (
-                        <p key={index} className="text-sm" style={{ color: entry.color }}>
-                          Early Repayment Balance: {formatCurrency(entry.value)}
-                        </p>
-                      );
-                    } else if (entry.dataKey === 'regularRemaining') {
-                      return (
-                        <p key={index} className="text-sm" style={{ color: entry.color }}>
-                          Standard Balance: {formatCurrency(entry.value)}
-                        </p>
-                      );
-                    } else if (entry.dataKey === 'earlyPayment' && entry.value > 0) {
-                      return (
-                        <p key={index} className="text-sm" style={{ color: colors.payment }}>
-                          Early Payment: {formatCurrency(entry.value)}
-                        </p>
-                      );
-                    }
-                    return null;
-                  })}
-                  <p className="text-sm font-medium mt-1" style={{ color: colors.payment }}>
-                    Savings: {formatCurrency(diff)}
-                  </p>
-                </>
-              );
-            }
-          }
         </div>
       );
     }
@@ -572,3 +581,5 @@ const EarlyRepayment = () => {
     </div>
   );
 };
+
+export default EarlyRepayment;

@@ -3,7 +3,7 @@ import { AppContext } from '../../contexts/AppContext';
 import { CurrencyContext } from '../../contexts/CurrencyContext';
 import { calculateMortgage } from '../../api';
 import InputField from '../common/InputField';
-import ResultsSummary from './ResultsSummary';
+import ResultsSummary from './ResultSummary';
 import PaymentChart from './PaymentChart';
 import RemainingLoanChart from './RemainingLoanChart';
 import DistributionChart from './DistributionChart';

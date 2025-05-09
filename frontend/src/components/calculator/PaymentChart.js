@@ -1,12 +1,14 @@
 import React, { useContext } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { CurrencyContext } from '../../contexts/CurrencyContext';
+import { getChartConfig } from '../../utils/chartConfig'; // Импорт конфигурации
 
 const PaymentChart = ({ scheduleData, darkMode }) => {
   const { formatCurrency, getCurrencySymbol } = useContext(CurrencyContext);
   const currencySymbol = getCurrencySymbol();
-  
-  // Prepare chart data - sample every 12 months for clarity
+  const chartConfig = getChartConfig(darkMode); // Получение конфигурации с учетом темной темы
+
+  // Подготовка данных для графика (оставить существующий код)
   const chartData = scheduleData
     .filter((_, index) => index % 12 === 0 || index === scheduleData.length - 1)
     .map(item => ({
@@ -17,23 +19,23 @@ const PaymentChart = ({ scheduleData, darkMode }) => {
       remainingLoan: parseFloat(item.remainingLoan.toFixed(2)),
       year: Math.ceil(item.month / 12)
     }));
-  
-  // Color scheme
+
+  // Цветовая схема (оставить существующий код)
   const colors = darkMode ? {
-    principal: '#BF9FFB',  // Purple
-    interest: '#90BFF9',   // Blue
-    background: '#0D1015', // Dark background
-    text: '#D1D4DC',       // Light text
-    grid: '#2A2E39'        // Grid lines
+    principal: '#BF9FFB',
+    interest: '#90BFF9',
+    background: '#0D1015',
+    text: '#D1D4DC',
+    grid: '#2A2E39'
   } : {
-    principal: '#9333ea',  // Purple
-    interest: '#3b82f6',   // Blue
-    background: '#ffffff', // White background
-    text: '#374151',       // Dark text
-    grid: '#e5e7eb'        // Grid lines
+    principal: '#9333ea',
+    interest: '#3b82f6',
+    background: '#ffffff',
+    text: '#374151',
+    grid: '#e5e7eb'
   };
-  
-  // Custom tooltip
+
+  // Пользовательская подсказка (оставить существующий код)
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       return (
@@ -52,40 +54,29 @@ const PaymentChart = ({ scheduleData, darkMode }) => {
     }
     return null;
   };
-  
+
   return (
     <div>
       <h3 className={`text-md font-medium mb-2 ${darkMode ? 'text-[#D1D4DC]' : 'text-gray-700'}`}>
         Payment Structure
       </h3>
-      <div className="h-64 md:h-72">
+      <div className="h-80 md:h-96">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 10 }}>
+          <BarChart data={chartData} margin={chartConfig.margin}>
             <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} />
-            <XAxis 
-              dataKey="year" 
-              tick={{ fill: colors.text }} 
-              stroke={colors.grid}
-              label={{ 
-                value: 'Year', 
-                position: 'insideBottom', 
-                offset: -5, 
-                fill: colors.text 
-              }}
+            <XAxis
+              dataKey="year"
+              {...chartConfig.xAxisConfig}
             />
-            <YAxis 
-              tick={{ fill: colors.text }} 
-              stroke={colors.grid}
-              label={{ 
-                value: currencySymbol, 
-                angle: -90, 
-                position: 'insideLeft', 
-                fill: colors.text 
-              }}
+            <YAxis
+              {...chartConfig.yAxisConfig}
+              tickFormatter={chartConfig.formatLargeNumber}
+              label={chartConfig.getCurrencyLabel(currencySymbol)}
             />
             <Tooltip content={<CustomTooltip />} />
-            <Legend 
+            <Legend
               formatter={(value) => <span style={{ color: colors.text }}>{value}</span>}
+              wrapperStyle={{ paddingTop: '20px' }}
             />
             <Bar 
               dataKey="principal" 

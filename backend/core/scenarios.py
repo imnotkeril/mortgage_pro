@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from .calculators import calculate_annuity_payment, generate_payment_schedule
+from backend.core.calculators import calculate_annuity_payment, generate_payment_schedule
 
 def calculate_early_repayment(loan_amount, interest_rate, loan_term_years,
                               early_payments=None):

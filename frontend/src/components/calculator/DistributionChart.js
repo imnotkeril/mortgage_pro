@@ -1,22 +1,24 @@
 import React, { useContext } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 import { CurrencyContext } from '../../contexts/CurrencyContext';
+import { getChartConfig } from '../../utils/chartConfig'; // Импорт конфигурации
 
 const DistributionChart = ({ totalInterest, loanAmount, darkMode }) => {
   const { formatCurrency } = useContext(CurrencyContext);
-  
-  // Prepare chart data
+  const chartConfig = getChartConfig(darkMode); // Получение конфигурации с учетом темы
+
+  // Подготовка данных (оставить существующий код)
   const data = [
     { name: 'Principal', value: loanAmount, color: darkMode ? '#BF9FFB' : '#9333ea' },
     { name: 'Interest', value: totalInterest, color: darkMode ? '#90BFF9' : '#3b82f6' }
   ];
-  
-  // Calculate percentages
+
+  // Расчет процентов (оставить существующий код)
   const totalAmount = loanAmount + totalInterest;
   const principalPercentage = (loanAmount / totalAmount * 100).toFixed(1);
   const interestPercentage = (totalInterest / totalAmount * 100).toFixed(1);
-  
-  // Custom tooltip
+
+  // Пользовательская подсказка (оставить существующий код)
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
@@ -33,41 +35,42 @@ const DistributionChart = ({ totalInterest, loanAmount, darkMode }) => {
     }
     return null;
   };
-  
-  // Custom label
+
+  // Пользовательская метка (с обновленным форматированием)
   const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index }) => {
     const RADIAN = Math.PI / 180;
-    const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+    const radius = outerRadius * 1.3;
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
     const y = cy + radius * Math.sin(-midAngle * RADIAN);
 
     return (
-      <text 
-        x={x} 
-        y={y} 
-        fill={darkMode ? '#ffffff' : '#000000'} 
-        textAnchor={x > cx ? 'start' : 'end'} 
+      <text
+        x={x}
+        y={y}
+        fill={data[index].color}
+        textAnchor={x > cx ? 'start' : 'end'}
         dominantBaseline="central"
+        fontWeight="bold"
       >
         {`${(percent * 100).toFixed(1)}%`}
       </text>
     );
   };
-  
+
   return (
     <div>
       <h3 className={`text-md font-medium mb-2 ${darkMode ? 'text-[#D1D4DC]' : 'text-gray-700'}`}>
         Payment Distribution
       </h3>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="h-64 md:h-72">
+        <div className="h-80 md:h-96">
           <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
+            <PieChart margin={chartConfig.margin}>
               <Pie
                 data={data}
                 cx="50%"
                 cy="50%"
-                labelLine={false}
+                labelLine={true}
                 label={renderCustomizedLabel}
                 outerRadius={80}
                 innerRadius={40}
@@ -78,17 +81,13 @@ const DistributionChart = ({ totalInterest, loanAmount, darkMode }) => {
                 ))}
               </Pie>
               <Tooltip content={<CustomTooltip />} />
-              <Legend
-                formatter={(value, entry, index) => (
-                  <span style={{ color: darkMode ? '#D1D4DC' : '#374151' }}>{value}</span>
-                )}
-              />
             </PieChart>
           </ResponsiveContainer>
         </div>
-        
+
         <div className="flex flex-col justify-center space-y-4">
-          <div className={`p-4 rounded ${darkMode ? 'bg-[#0D1015] border border-[#2A2E39]' : 'bg-gray-50 border border-gray-200'}`}>
+          <div className={`p-4 rounded relative ${darkMode ? 'bg-[#0D1015] border border-[#2A2E39]' : 'bg-gray-50 border border-gray-200'}`}
+            style={{ borderLeftWidth: '4px', borderLeftColor: data[0].color }}>
             <div className="flex items-center">
               <div className="w-4 h-4 rounded-full mr-2" style={{ backgroundColor: data[0].color }}></div>
               <div className={`text-sm ${darkMode ? 'text-[#D1D4DC]' : 'text-gray-500'}`}>Principal</div>
@@ -100,8 +99,9 @@ const DistributionChart = ({ totalInterest, loanAmount, darkMode }) => {
               </span>
             </div>
           </div>
-          
-          <div className={`p-4 rounded ${darkMode ? 'bg-[#0D1015] border border-[#2A2E39]' : 'bg-gray-50 border border-gray-200'}`}>
+
+          <div className={`p-4 rounded relative ${darkMode ? 'bg-[#0D1015] border border-[#2A2E39]' : 'bg-gray-50 border border-gray-200'}`}
+            style={{ borderLeftWidth: '4px', borderLeftColor: data[1].color }}>
             <div className="flex items-center">
               <div className="w-4 h-4 rounded-full mr-2" style={{ backgroundColor: data[1].color }}></div>
               <div className={`text-sm ${darkMode ? 'text-[#D1D4DC]' : 'text-gray-500'}`}>Interest</div>

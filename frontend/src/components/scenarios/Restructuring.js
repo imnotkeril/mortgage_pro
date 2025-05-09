@@ -335,7 +335,7 @@ const Restructuring = () => {
                 const originalMonths = originalMonthsRemaining % 12;
                 
                 const restructuredYears = Math.floor(restructuredMonths / 12);
-                const restructuredMonths = restructuredMonths % 12;
+                const restructuredMonthsRem = restructuredMonths % 12;
                 
                 const diffYears = Math.floor(Math.abs(diffMonths) / 12);
                 const diffMonthsRem = Math.abs(diffMonths) % 12;
@@ -428,24 +428,28 @@ const Restructuring = () => {
           </div>
           
           <div className={`mt-4 p-4 rounded ${darkMode ? 'bg-[#0D1015] border border-[#2A2E39]' : 'bg-gray-50 border border-gray-200'}`}>
-            <h3 className={`text-md font-medium mb-2 ${darkMode ? 'text-[#D1D4DC]' : 'text-gray-700'}`}>
-              Understanding Restructuring
-            </h3>
-            <div className={`text-sm ${darkMode ? 'text-[#D1D4DC]' : 'text-gray-600'}`}>
-              <p>
-                Restructuring your mortgage can help you take advantage of lower interest rates or adjust your payment terms. This comparison shows you how your current remaining payments would compare with a restructured loan.
-              </p>
-              <p className="mt-2">
-                <span className="font-medium">Lower Interest Rate:</span> If the new rate is lower than your original rate, you can potentially save on total interest, even if you extend the term.
-              </p>
-              <p className="mt-2">
-                <span className="font-medium">Shorter Term:</span> Shortening your loan term typically increases monthly payments but reduces the total interest paid over the life of the loan.
-              </p>
-              <p className="mt-2">
-                <span className="font-medium">Longer Term:</span> Extending your loan term typically decreases monthly payments but increases the total interest paid over the life of the loan.
-              </p>
+                <h3 className={`text-md font-medium mb-2 ${darkMode ? 'text-[#D1D4DC]' : 'text-gray-700'}`}>
+                  Understanding Restructuring
+                </h3>
+                <div className={`text-sm ${darkMode ? 'text-[#D1D4DC]' : 'text-gray-600'}`}>
+                  <p>
+                    Restructuring your mortgage can help you take advantage of lower interest rates or adjust your payment terms. This comparison shows you how your current remaining payments would compare with a restructured loan.
+                  </p>
+                  <p className="mt-2">
+                    <span className="font-medium">Lower Interest Rate:</span> If the new rate is lower than your original rate, you can potentially save on total interest, even if you extend the term.
+                  </p>
+                  <p className="mt-2">
+                    <span className="font-medium">Shorter Term:</span> Shortening your loan term typically increases monthly payments but reduces the total interest paid over the life of the loan.
+                  </p>
+                  <p className="mt-2">
+                    <span className="font-medium">Longer Term:</span> Extending your loan term typically decreases monthly payments but increases the total interest paid over the life of the loan.
+                  </p>
+                </div>
+              </div>
             </div>
+          )}
           </div>
-        </div>
-      )}
-    </div>
+            );
+          };
+
+          export default Restructuring;
