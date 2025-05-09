@@ -286,33 +286,27 @@ const Insurance = () => {
             <h3 className={`text-md font-medium mb-2 ${darkMode ? 'text-[#D1D4DC]' : 'text-gray-700'}`}>
               Payment Structure with Insurance
             </h3>
+
             <div className="h-64 md:h-80">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} />
-                  <XAxis 
-                    dataKey="year" 
-                    tick={{ fill: colors.text }} 
+                  <XAxis
+                    dataKey="year"
+                    tick={{ fill: colors.text }}
                     stroke={colors.grid}
-                    label={{ 
-                      value: 'Year', 
-                      position: 'insideBottom', 
-                      offset: -5, 
-                      fill: colors.text 
-                    }}
                   />
-                  <YAxis 
-                    tick={{ fill: colors.text }} 
+                  <YAxis
+                    tick={{ fill: colors.text }}
                     stroke={colors.grid}
-                    label={{ 
-                      value: getCurrencySymbol(), 
-                      angle: -90, 
-                      position: 'insideLeft', 
-                      fill: colors.text 
+                    tickFormatter={(value) => {
+                      if (value >= 1000000) return `${(value / 1000000).toFixed(1)}M`;
+                      if (value >= 1000) return `${(value / 1000).toFixed(0)}K`;
+                      return value;
                     }}
                   />
                   <Tooltip content={<CustomTooltip />} />
-                  <Legend 
+                  <Legend
                     formatter={(value) => {
                       switch (value) {
                         case 'payment':
@@ -324,14 +318,14 @@ const Insurance = () => {
                       }
                     }}
                   />
-                  <Bar 
-                    dataKey="payment" 
+                  <Bar
+                    dataKey="payment"
                     fill={colors.payment}
                     stackId="a"
                     barSize={20}
                   />
-                  <Bar 
-                    dataKey="insurance" 
+                  <Bar
+                    dataKey="insurance"
                     fill={colors.insurance}
                     stackId="a"
                     barSize={20}

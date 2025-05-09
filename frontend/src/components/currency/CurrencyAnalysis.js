@@ -446,12 +446,13 @@ const CurrencyAnalysis = () => {
                     <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} />
                     <XAxis
                       dataKey="year"
-                      {...chartConfig.xAxisConfig}
+                      tick={{ fill: colors.text }}
+                      stroke={colors.grid}
                     />
                     <YAxis
-                      {...chartConfig.yAxisConfig}
-                      tickFormatter={(value) => chartConfig.formatLargeNumber(value)}
-                      domain={['auto', 'auto']} // Allow chart to determine appropriate range
+                      tick={{ fill: colors.text }}
+                      stroke={colors.grid}
+                      tickFormatter={chartConfig.formatLargeNumber}
                     />
                     <Tooltip content={<CustomTooltip />} />
                     <Legend
@@ -489,19 +490,13 @@ const CurrencyAnalysis = () => {
                     <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} />
                     <XAxis
                       dataKey="year"
-                      {...chartConfig.xAxisConfig}
+                      tick={{ fill: colors.text }}
+                      stroke={colors.grid}
                     />
                     <YAxis
-                      {...chartConfig.yAxisConfig}
+                      tick={{ fill: colors.text }}
+                      stroke={colors.grid}
                       tickFormatter={(value) => value.toFixed(2)}
-                      label={{
-                        value: 'Rate',
-                        angle: -90,
-                        position: 'insideLeft',
-                        offset: 0,
-                        fill: colors.text
-                      }}
-                      domain={['auto', 'auto']} // Allow chart to determine appropriate range
                     />
                     <Tooltip content={<CustomTooltip />} />
                     <Legend

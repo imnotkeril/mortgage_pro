@@ -1,24 +1,22 @@
 import React, { useContext } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 import { CurrencyContext } from '../../contexts/CurrencyContext';
-import { getChartConfig } from '../../utils/chartConfig'; // Импорт конфигурации
 
 const DistributionChart = ({ totalInterest, loanAmount, darkMode }) => {
   const { formatCurrency } = useContext(CurrencyContext);
-  const chartConfig = getChartConfig(darkMode); // Получение конфигурации с учетом темы
 
-  // Подготовка данных (оставить существующий код)
+  // Подготовка данных
   const data = [
     { name: 'Principal', value: loanAmount, color: darkMode ? '#BF9FFB' : '#9333ea' },
     { name: 'Interest', value: totalInterest, color: darkMode ? '#90BFF9' : '#3b82f6' }
   ];
 
-  // Расчет процентов (оставить существующий код)
+  // Расчет процентов
   const totalAmount = loanAmount + totalInterest;
   const principalPercentage = (loanAmount / totalAmount * 100).toFixed(1);
   const interestPercentage = (totalInterest / totalAmount * 100).toFixed(1);
 
-  // Пользовательская подсказка (оставить существующий код)
+  // Пользовательская подсказка
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
@@ -36,10 +34,10 @@ const DistributionChart = ({ totalInterest, loanAmount, darkMode }) => {
     return null;
   };
 
-  // Пользовательская метка (с обновленным форматированием)
+  // Пользовательская метка
   const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index }) => {
     const RADIAN = Math.PI / 180;
-    const radius = outerRadius * 1.3;
+    const radius = outerRadius * 1.1;
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
     const y = cy + radius * Math.sin(-midAngle * RADIAN);
 
@@ -65,7 +63,7 @@ const DistributionChart = ({ totalInterest, loanAmount, darkMode }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="h-80 md:h-96">
           <ResponsiveContainer width="100%" height="100%">
-            <PieChart margin={chartConfig.margin}>
+            <PieChart margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
               <Pie
                 data={data}
                 cx="50%"

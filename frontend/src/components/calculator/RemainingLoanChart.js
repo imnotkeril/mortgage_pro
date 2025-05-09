@@ -1,11 +1,9 @@
 import React, { useContext } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { CurrencyContext } from '../../contexts/CurrencyContext';
-import { getChartConfig } from '../../utils/chartConfig';
 
 const RemainingLoanChart = ({ scheduleData, darkMode }) => {
   const { formatCurrency, getCurrencySymbol } = useContext(CurrencyContext);
-  const chartConfig = getChartConfig(darkMode);
   const currencySymbol = getCurrencySymbol();
 
   // Prepare chart data
@@ -56,7 +54,7 @@ const RemainingLoanChart = ({ scheduleData, darkMode }) => {
       </h3>
       <div className="h-80 md:h-96">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={chartData}>
+          <LineChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
             <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} />
             <XAxis
               dataKey="year"
@@ -66,7 +64,11 @@ const RemainingLoanChart = ({ scheduleData, darkMode }) => {
             <YAxis
               tick={{ fill: colors.text }}
               stroke={colors.grid}
-              tickFormatter={(value) => chartConfig.formatValue(value)}
+              tickFormatter={(value) => {
+                if (value >= 1000000) return `${(value / 1000000).toFixed(1)}M`;
+                if (value >= 1000) return `${(value / 1000).toFixed(0)}K`;
+                return value;
+              }}
               domain={[0, 'auto']}
             />
             <Tooltip content={<CustomTooltip />} />

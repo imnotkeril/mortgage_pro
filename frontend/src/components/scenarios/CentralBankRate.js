@@ -547,29 +547,22 @@ const CentralBankRate = () => {
                 {chartType === 'payments' ? (
                   <LineChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} />
-                    <XAxis 
-                      dataKey="year" 
-                      tick={{ fill: colors.text }} 
+                    <XAxis
+                      dataKey="year"
+                      tick={{ fill: colors.text }}
                       stroke={colors.grid}
-                      label={{ 
-                        value: 'Year', 
-                        position: 'insideBottom', 
-                        offset: -5, 
-                        fill: colors.text 
-                      }}
                     />
-                    <YAxis 
-                      tick={{ fill: colors.text }} 
+                    <YAxis
+                      tick={{ fill: colors.text }}
                       stroke={colors.grid}
-                      label={{ 
-                        value: getCurrencySymbol(), 
-                        angle: -90, 
-                        position: 'insideLeft', 
-                        fill: colors.text 
+                      tickFormatter={(value) => {
+                        if (value >= 1000000) return `${(value / 1000000).toFixed(1)}M`;
+                        if (value >= 1000) return `${(value / 1000).toFixed(0)}K`;
+                        return value;
                       }}
                     />
                     <Tooltip content={<PaymentsTooltip />} />
-                    <Legend 
+                    <Legend
                       formatter={(value) => {
                         switch (value) {
                           case 'fixedPayment':
@@ -581,31 +574,31 @@ const CentralBankRate = () => {
                         }
                       }}
                     />
-                    <Line 
-                      type="monotone" 
-                      dataKey="fixedPayment" 
+                    <Line
+                      type="monotone"
+                      dataKey="fixedPayment"
                       stroke={colors.fixed}
                       strokeWidth={2}
-                      dot={{ 
+                      dot={{
                         fill: colors.fixed,
                         r: 4
                       }}
-                      activeDot={{ 
+                      activeDot={{
                         fill: colors.fixed,
                         r: 6,
                         stroke: colors.background
                       }}
                     />
-                    <Line 
-                      type="monotone" 
-                      dataKey="cbPayment" 
+                    <Line
+                      type="monotone"
+                      dataKey="cbPayment"
                       stroke={colors.cb}
                       strokeWidth={2}
-                      dot={{ 
+                      dot={{
                         fill: colors.cb,
                         r: 4
                       }}
-                      activeDot={{ 
+                      activeDot={{
                         fill: colors.cb,
                         r: 6,
                         stroke: colors.background
@@ -615,29 +608,17 @@ const CentralBankRate = () => {
                 ) : (
                   <LineChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} />
-                    <XAxis 
-                      dataKey="year" 
-                      tick={{ fill: colors.text }} 
+                    <XAxis
+                      dataKey="year"
+                      tick={{ fill: colors.text }}
                       stroke={colors.grid}
-                      label={{ 
-                        value: 'Year', 
-                        position: 'insideBottom', 
-                        offset: -5, 
-                        fill: colors.text 
-                      }}
                     />
-                    <YAxis 
-                      tick={{ fill: colors.text }} 
+                    <YAxis
+                      tick={{ fill: colors.text }}
                       stroke={colors.grid}
-                      label={{ 
-                        value: 'Rate (%)', 
-                        angle: -90, 
-                        position: 'insideLeft', 
-                        fill: colors.text 
-                      }}
                     />
                     <Tooltip content={<RatesTooltip />} />
-                    <Legend 
+                    <Legend
                       formatter={(value) => {
                         switch (value) {
                           case 'cbRate':
@@ -649,31 +630,31 @@ const CentralBankRate = () => {
                         }
                       }}
                     />
-                    <Line 
-                      type="monotone" 
-                      dataKey="cbRate" 
+                    <Line
+                      type="monotone"
+                      dataKey="cbRate"
                       stroke={colors.cbRate}
                       strokeWidth={2}
-                      dot={{ 
+                      dot={{
                         fill: colors.cbRate,
                         r: 4
                       }}
-                      activeDot={{ 
+                      activeDot={{
                         fill: colors.cbRate,
                         r: 6,
                         stroke: colors.background
                       }}
                     />
-                    <Line 
-                      type="monotone" 
-                      dataKey="interestRate" 
+                    <Line
+                      type="monotone"
+                      dataKey="interestRate"
                       stroke={colors.interestRate}
                       strokeWidth={2}
-                      dot={{ 
+                      dot={{
                         fill: colors.interestRate,
                         r: 4
                       }}
-                      activeDot={{ 
+                      activeDot={{
                         fill: colors.interestRate,
                         r: 6,
                         stroke: colors.background

@@ -469,58 +469,51 @@ const RentVsBuy = () => {
                 {activeTab === 'costs' ? (
                   <LineChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} />
-                    <XAxis 
-                      dataKey="year" 
-                      tick={{ fill: colors.text }} 
+                    <XAxis
+                      dataKey="year"
+                      tick={{ fill: colors.text }}
                       stroke={colors.grid}
-                      label={{ 
-                        value: 'Year', 
-                        position: 'insideBottom', 
-                        offset: -5, 
-                        fill: colors.text 
-                      }}
                     />
-                    <YAxis 
-                      tick={{ fill: colors.text }} 
+                    <YAxis
+                      tick={{ fill: colors.text }}
                       stroke={colors.grid}
-                      label={{ 
-                        value: getCurrencySymbol(), 
-                        angle: -90, 
-                        position: 'insideLeft', 
-                        fill: colors.text 
+                      tickFormatter={(value) => {
+                        if (value >= 1000000) return `${(value / 1000000).toFixed(1)}M`;
+                        if (value >= 1000) return `${(value / 1000).toFixed(0)}K`;
+                        return value;
                       }}
                     />
                     <Tooltip content={<CustomTooltip />} />
-                    <Legend 
+                    <Legend
                       formatter={(value) => <span style={{ color: colors.text }}>{value}</span>}
                     />
-                    <Line 
-                      type="monotone" 
-                      dataKey="totalBuyCost" 
-                      name="Monthly Buying Costs" 
+                    <Line
+                      type="monotone"
+                      dataKey="totalBuyCost"
+                      name="Monthly Buying Costs"
                       stroke={colors.buy}
                       strokeWidth={2}
-                      dot={{ 
+                      dot={{
                         fill: colors.buy,
                         r: 4
                       }}
-                      activeDot={{ 
+                      activeDot={{
                         fill: colors.buy,
                         r: 6,
                         stroke: colors.background
                       }}
                     />
-                    <Line 
-                      type="monotone" 
-                      dataKey="totalRentCost" 
-                      name="Monthly Renting Costs" 
+                    <Line
+                      type="monotone"
+                      dataKey="totalRentCost"
+                      name="Monthly Renting Costs"
                       stroke={colors.rent}
                       strokeWidth={2}
-                      dot={{ 
+                      dot={{
                         fill: colors.rent,
                         r: 4
                       }}
-                      activeDot={{ 
+                      activeDot={{
                         fill: colors.rent,
                         r: 6,
                         stroke: colors.background
@@ -528,75 +521,68 @@ const RentVsBuy = () => {
                     />
                   </LineChart>
                 ) : (
-<LineChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} />
-                    <XAxis 
-                      dataKey="year" 
-                      tick={{ fill: colors.text }} 
-                      stroke={colors.grid}
-                      label={{ 
-                        value: 'Year', 
-                        position: 'insideBottom', 
-                        offset: -5, 
-                        fill: colors.text 
-                      }}
+                <LineChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} />
+                  <XAxis
+                    dataKey="year"
+                    tick={{ fill: colors.text }}
+                    stroke={colors.grid}
+                  />
+                  <YAxis
+                    tick={{ fill: colors.text }}
+                    stroke={colors.grid}
+                    tickFormatter={(value) => {
+                      if (value >= 1000000) return `${(value / 1000000).toFixed(1)}M`;
+                      if (value >= 1000) return `${(value / 1000).toFixed(0)}K`;
+                      return value;
+                    }}
+                  />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Legend
+                    formatter={(value) => <span style={{ color: colors.text }}>{value}</span>}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="netWorthBuy"
+                    name="Net Worth When Buying"
+                    stroke={colors.buy}
+                    strokeWidth={2}
+                    dot={{
+                      fill: colors.buy,
+                      r: 4
+                    }}
+                    activeDot={{
+                      fill: colors.buy,
+                      r: 6,
+                      stroke: colors.background
+                    }}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="netWorthRent"
+                    name="Net Worth When Renting"
+                    stroke={colors.rent}
+                    strokeWidth={2}
+                    dot={{
+                      fill: colors.rent,
+                      r: 4
+                    }}
+                    activeDot={{
+                      fill: colors.rent,
+                      r: 6,
+                      stroke: colors.background
+                    }}
+                  />
+                  {breakEvenPoint && (
+                    <ReferenceDot
+                      x={breakEvenPoint.x}
+                      y={breakEvenPoint.y}
+                      r={6}
+                      fill={colors.breakEven}
+                      stroke={colors.background}
                     />
-                    <YAxis 
-                      tick={{ fill: colors.text }} 
-                      stroke={colors.grid}
-                      label={{ 
-                        value: getCurrencySymbol(), 
-                        angle: -90, 
-                        position: 'insideLeft', 
-                        fill: colors.text 
-                      }}
-                    />
-                    <Tooltip content={<CustomTooltip />} />
-                    <Legend 
-                      formatter={(value) => <span style={{ color: colors.text }}>{value}</span>}
-                    />
-                    <Line 
-                      type="monotone" 
-                      dataKey="netWorthBuy" 
-                      name="Net Worth When Buying" 
-                      stroke={colors.buy}
-                      strokeWidth={2}
-                      dot={{ 
-                        fill: colors.buy,
-                        r: 4
-                      }}
-                      activeDot={{ 
-                        fill: colors.buy,
-                        r: 6,
-                        stroke: colors.background
-                      }}
-                    />
-                    <Line 
-                      type="monotone" 
-                      dataKey="netWorthRent" 
-                      name="Net Worth When Renting" 
-                      stroke={colors.rent}
-                      strokeWidth={2}
-                      dot={{ 
-                        fill: colors.rent,
-                        r: 4
-                      }}
-                      activeDot={{ 
-                        fill: colors.rent,
-                        r: 6,
-                        stroke: colors.background
-                      }}
-                    />
-                    {breakEvenPoint && (
-                      <ReferenceDot
-                        x={breakEvenPoint.x}
-                        y={breakEvenPoint.y}
-                        r={6}
-                        fill={colors.breakEven}
-                        stroke={colors.background}
-                      />
-                    )}
-                  </LineChart>
+                  )}
+                </LineChart>
                 )}
               </ResponsiveContainer>
             </div>

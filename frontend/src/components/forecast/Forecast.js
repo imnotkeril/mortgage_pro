@@ -249,17 +249,21 @@ const Forecast = () => {
               <h3 className={`text-md font-medium mb-2 ${darkMode ? 'text-[#D1D4DC]' : 'text-gray-700'}`}>
                 Property Value Projection
               </h3>
+
+
               <div className="h-64 md:h-80">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={chartData} margin={chartConfig.margin}>
                     <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} />
                     <XAxis
                       dataKey="year"
-                      {...chartConfig.xAxisConfig}
+                      tick={{ fill: colors.text }}
+                      stroke={colors.grid}
                     />
                     <YAxis
-                      {...chartConfig.yAxisConfig}
-                      tickFormatter={(value) => chartConfig.formatLargeNumber(value)}
+                      tick={{ fill: colors.text }}
+                      stroke={colors.grid}
+                      tickFormatter={chartConfig.formatLargeNumber}
                       domain={[0, 'auto']} // Ensure y-axis starts at 0
                     />
                     <Tooltip content={<CustomTooltip />} />

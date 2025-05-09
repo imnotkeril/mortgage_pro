@@ -378,29 +378,22 @@ const Restructuring = () => {
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} />
-                  <XAxis 
-                    dataKey="year" 
-                    tick={{ fill: colors.text }} 
+                  <XAxis
+                    dataKey="year"
+                    tick={{ fill: colors.text }}
                     stroke={colors.grid}
-                    label={{ 
-                      value: 'Year', 
-                      position: 'insideBottom', 
-                      offset: -5, 
-                      fill: colors.text 
-                    }}
                   />
-                  <YAxis 
-                    tick={{ fill: colors.text }} 
+                  <YAxis
+                    tick={{ fill: colors.text }}
                     stroke={colors.grid}
-                    label={{ 
-                      value: getCurrencySymbol(), 
-                      angle: -90, 
-                      position: 'insideLeft', 
-                      fill: colors.text 
+                    tickFormatter={(value) => {
+                      if (value >= 1000000) return `${(value / 1000000).toFixed(1)}M`;
+                      if (value >= 1000) return `${(value / 1000).toFixed(0)}K`;
+                      return value;
                     }}
                   />
                   <Tooltip content={<CustomTooltip />} />
-                  <Legend 
+                  <Legend
                     formatter={(value) => {
                       switch (value) {
                         case 'originalPayment':
@@ -412,13 +405,13 @@ const Restructuring = () => {
                       }
                     }}
                   />
-                  <Bar 
-                    dataKey="originalPayment" 
+                  <Bar
+                    dataKey="originalPayment"
                     fill={colors.original}
                     barSize={20}
                   />
-                  <Bar 
-                    dataKey="restructuredPayment" 
+                  <Bar
+                    dataKey="restructuredPayment"
                     fill={colors.restructured}
                     barSize={20}
                   />
