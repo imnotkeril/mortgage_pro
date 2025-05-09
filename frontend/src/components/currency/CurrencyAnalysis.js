@@ -5,17 +5,20 @@ import { analyzeCurrency } from '../../api';
 import InputField from '../common/InputField';
 import Loader from '../common/Loader';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { getChartConfig } from '../../utils/chartConfig';
 
 const CurrencyAnalysis = () => {
   const { darkMode } = useContext(AppContext);
-  const { 
-    currency, 
+  const {
+    currency,
     setCurrency,
-    formatCurrency, 
+    formatCurrency,
     getCurrencySymbol,
-    exchangeRates 
+    exchangeRates
   } = useContext(CurrencyContext);
-  
+
+  const chartConfig = getChartConfig(darkMode);
+
   // State for currency analysis parameters
   const [currencyParams, setCurrencyParams] = useState({
     loanAmount: 10000000,
@@ -25,7 +28,7 @@ const CurrencyAnalysis = () => {
     targetCurrencies: ['RUB', 'USD', 'EUR'].filter(c => c !== currency),
     currencyAnnualChange: null // Will use default values from API
   });
-  
+
   // State for custom exchange rate changes
   const [customExchangeRates, setCustomExchangeRates] = useState({
     'RUB': { 'USD': -2.0, 'EUR': -1.5, 'JPY': -1.0 },
@@ -33,26 +36,26 @@ const CurrencyAnalysis = () => {
     'EUR': { 'RUB': 1.5, 'USD': -0.5, 'JPY': 0.5 },
     'JPY': { 'RUB': 1.0, 'USD': -1.0, 'EUR': -0.5 }
   });
-  
+
   // State for analysis results
   const [analysisResults, setAnalysisResults] = useState({
     currencyAnalysis: [],
     totalInterest: {}
   });
-  
+
   // State for available currencies
   const [availableCurrencies, setAvailableCurrencies] = useState(['RUB', 'USD', 'EUR', 'JPY']);
-  
+
   // State for selected currencies to display
   const [selectedCurrencies, setSelectedCurrencies] = useState(['RUB', 'USD']);
-  
+
   // Loading and error states
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  
+
   // State for currently displayed chart (payments or rates)
   const [chartType, setChartType] = useState('payments'); // 'payments' or 'rates'
-  
+
   // Update base currency when global currency changes
   useEffect(() => {
     setCurrencyParams(prev => ({
@@ -60,20 +63,20 @@ const CurrencyAnalysis = () => {
       baseCurrency: currency,
       targetCurrencies: availableCurrencies.filter(c => c !== currency)
     }));
-    
+
     setSelectedCurrencies([
       currency,
       ...availableCurrencies.filter(c => c !== currency).slice(0, 1)
     ]);
   }, [currency, availableCurrencies]);
-  
+
   // Get currency analysis when parameters change
   useEffect(() => {
     const getAnalysis = async () => {
       try {
         setIsLoading(true);
         setError(null);
-        
+
         // Convert custom exchange rates to format expected by API
         const apiExchangeRates = {};
         for (const fromCurr in customExchangeRates) {
@@ -83,12 +86,12 @@ const CurrencyAnalysis = () => {
             apiExchangeRates[fromCurr][toCurr] = customExchangeRates[fromCurr][toCurr] / 100;
           }
         }
-        
+
         const params = {
           ...currencyParams,
           currencyAnnualChange: apiExchangeRates
         };
-        
+
         const result = await analyzeCurrency(params);
         setAnalysisResults(result);
       } catch (err) {
@@ -98,10 +101,10 @@ const CurrencyAnalysis = () => {
         setIsLoading(false);
       }
     };
-    
+
     getAnalysis();
   }, [currencyParams, customExchangeRates]);
-  
+
   // Handle input changes
   const handleInputChange = (name, value) => {
     setCurrencyParams(prev => ({
@@ -109,7 +112,7 @@ const CurrencyAnalysis = () => {
       [name]: value
     }));
   };
-  
+
   // Handle custom exchange rate changes
   const handleExchangeRateChange = (fromCurrency, toCurrency, value) => {
     setCustomExchangeRates(prev => ({
@@ -120,7 +123,7 @@ const CurrencyAnalysis = () => {
       }
     }));
   };
-  
+
   // Handle currency selection
   const handleCurrencySelection = (curr) => {
     if (selectedCurrencies.includes(curr)) {
@@ -133,7 +136,7 @@ const CurrencyAnalysis = () => {
       setSelectedCurrencies([...selectedCurrencies, curr]);
     }
   };
-  
+
   // Prepare chart data - sample every 12 months for clarity
   const chartData = analysisResults.currencyAnalysis
     ? analysisResults.currencyAnalysis
@@ -144,61 +147,61 @@ const CurrencyAnalysis = () => {
             month: item.month,
             year: Math.ceil(item.month / 12)
           };
-          
+
           // Add payment data for each selected currency
           selectedCurrencies.forEach(curr => {
             if (curr && item[`payment_${curr}`] !== undefined) {
               dataPoint[`payment_${curr}`] = item[`payment_${curr}`];
             }
-            
+
             // Add exchange rate data
             if (curr !== currencyParams.baseCurrency && item[`rate_${curr}`] !== undefined) {
               dataPoint[`rate_${curr}`] = item[`rate_${curr}`];
             }
           });
-          
+
           return dataPoint;
         })
     : [];
-  
-  // Color scheme
+
+  // Color scheme with improved clarity
   const currencyColors = {
     'RUB': darkMode ? '#BF9FFB' : '#9333ea', // Purple
     'USD': darkMode ? '#90BFF9' : '#3b82f6', // Blue
     'EUR': darkMode ? '#FFF59D' : '#eab308', // Yellow
     'JPY': darkMode ? '#74F174' : '#22c55e'  // Green
   };
-  
+
   const colors = {
     background: darkMode ? '#0D1015' : '#ffffff', // Background
     text: darkMode ? '#D1D4DC' : '#374151',       // Text
     grid: darkMode ? '#2A2E39' : '#e5e7eb'        // Grid lines
   };
-  
-  // Custom tooltip for currency charts
+
+  // Custom tooltip for currency charts with proper formatting
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       return (
-        <div className={`p-2 border rounded shadow ${darkMode ? 'bg-[#141418] border-[#2A2E39]' : 'bg-white border-gray-200'}`}>
-          <p className="text-sm font-medium">Year {label}</p>
+        <div className={`p-3 border rounded shadow ${darkMode ? 'bg-[#141418] border-[#2A2E39]' : 'bg-white border-gray-200'}`}>
+          <p className="text-sm font-medium mb-2">Year {label}</p>
           {payload.map((entry, index) => {
             const currencyCode = entry.dataKey.split('_')[1];
             const dataType = entry.dataKey.split('_')[0];
-            
+
             if (dataType === 'payment') {
               return (
-                <p key={index} className="text-sm" style={{ color: entry.color }}>
+                <p key={index} className="text-sm mb-1" style={{ color: entry.color }}>
                   Payment in {currencyCode}: {formatCurrency(entry.value, currencyCode)}
                 </p>
               );
             } else if (dataType === 'rate') {
               return (
-                <p key={index} className="text-sm" style={{ color: entry.color }}>
+                <p key={index} className="text-sm mb-1" style={{ color: entry.color }}>
                   Rate {currencyParams.baseCurrency}/{currencyCode}: {entry.value.toFixed(4)}
                 </p>
               );
             }
-            
+
             return null;
           })}
         </div>
@@ -206,19 +209,19 @@ const CurrencyAnalysis = () => {
     }
     return null;
   };
-  
+
   return (
     <div className="max-w-6xl mx-auto">
       <h1 className={`text-2xl font-bold mb-6 ${darkMode ? 'text-[#BF9FFB]' : 'text-purple-600'}`}>
         Currency Analysis
       </h1>
-      
+
       {/* Input Form */}
       <div className={`p-4 rounded shadow mb-6 ${darkMode ? 'bg-[#141418]' : 'bg-white border border-gray-200'}`}>
         <h2 className={`text-lg font-semibold mb-4 ${darkMode ? 'text-[#BF9FFB]' : 'text-purple-600'}`}>
           Loan Parameters
         </h2>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <InputField
             label="Loan Amount"
@@ -227,7 +230,7 @@ const CurrencyAnalysis = () => {
             prefix={getCurrencySymbol()}
             darkMode={darkMode}
           />
-          
+
           <InputField
             label="Interest Rate (%)"
             value={currencyParams.interestRate}
@@ -238,7 +241,7 @@ const CurrencyAnalysis = () => {
             min="0.1"
             max="30"
           />
-          
+
           <InputField
             label="Loan Term (years)"
             value={currencyParams.loanTermYears}
@@ -251,11 +254,11 @@ const CurrencyAnalysis = () => {
             type="number"
           />
         </div>
-        
+
         <h2 className={`text-lg font-semibold mb-4 ${darkMode ? 'text-[#BF9FFB]' : 'text-purple-600'}`}>
           Currency Settings
         </h2>
-        
+
         <div className="mb-6">
           <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-[#D1D4DC]' : 'text-gray-700'}`}>
             Base Currency
@@ -280,7 +283,7 @@ const CurrencyAnalysis = () => {
             ))}
           </div>
         </div>
-        
+
         <div className="mb-6">
           <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-[#D1D4DC]' : 'text-gray-700'}`}>
             Currencies to Compare (select to toggle)
@@ -302,7 +305,7 @@ const CurrencyAnalysis = () => {
             ))}
           </div>
         </div>
-        
+
         <div>
           <h3 className={`text-md font-medium mb-3 ${darkMode ? 'text-[#D1D4DC]' : 'text-gray-700'}`}>
             Exchange Rate Projection (Annual % Change)
@@ -336,7 +339,7 @@ const CurrencyAnalysis = () => {
                             type="number"
                             value={customExchangeRates[fromCurr][toCurr]}
                             onChange={(e) => handleExchangeRateChange(
-                              fromCurr, 
+                              fromCurr,
                               toCurr,
                               parseFloat(e.target.value)
                             )}
@@ -365,20 +368,20 @@ const CurrencyAnalysis = () => {
           </div>
         </div>
       </div>
-      
+
       {/* Loading and Error States */}
       {isLoading && (
         <div className="flex justify-center my-8">
           <Loader />
         </div>
       )}
-      
+
       {error && (
         <div className={`p-4 mb-6 rounded ${darkMode ? 'bg-red-900' : 'bg-red-100 border border-red-400'}`}>
           <p className={darkMode ? 'text-red-200' : 'text-red-700'}>{error}</p>
         </div>
       )}
-      
+
       {/* Results Section */}
       {!isLoading && !error && analysisResults.currencyAnalysis && analysisResults.currencyAnalysis.length > 0 && (
         <>
@@ -410,7 +413,7 @@ const CurrencyAnalysis = () => {
                 </button>
               </div>
             </div>
-            
+
             {/* Summary of total interest */}
             {chartType === 'payments' && (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -424,9 +427,9 @@ const CurrencyAnalysis = () => {
                     </div>
                     <div className={`text-sm ${darkMode ? 'text-[#D1D4DC]' : 'text-gray-500'}`}>
                       Percentage of loan: {(
-                        (analysisResults.totalInterest?.[curr] || 0) / 
-                        (curr === currencyParams.baseCurrency 
-                          ? currencyParams.loanAmount 
+                        (analysisResults.totalInterest?.[curr] || 0) /
+                        (curr === currencyParams.baseCurrency
+                          ? currencyParams.loanAmount
                           : (currencyParams.loanAmount * analysisResults.currencyAnalysis[0][`rate_${curr}`] || 0)
                         ) * 100).toFixed(1)}%
                     </div>
@@ -434,36 +437,24 @@ const CurrencyAnalysis = () => {
                 ))}
               </div>
             )}
-            
-            {/* Charts */}
-            <div className="h-64 md:h-80">
+
+            {/* Improved Charts with proper spacing and formatting */}
+            <div className="h-64 md:h-96">
               <ResponsiveContainer width="100%" height="100%">
                 {chartType === 'payments' ? (
-                  <LineChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
+                  <LineChart data={chartData} margin={chartConfig.margin}>
                     <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} />
-                    <XAxis 
-                      dataKey="year" 
-                      tick={{ fill: colors.text }} 
-                      stroke={colors.grid}
-                      label={{ 
-                        value: 'Year', 
-                        position: 'insideBottom', 
-                        offset: -5, 
-                        fill: colors.text 
-                      }}
+                    <XAxis
+                      dataKey="year"
+                      {...chartConfig.xAxisConfig}
                     />
-                    <YAxis 
-                      tick={{ fill: colors.text }} 
-                      stroke={colors.grid}
-                      label={{ 
-                        value: 'Payment Amount', 
-                        angle: -90, 
-                        position: 'insideLeft', 
-                        fill: colors.text 
-                      }}
+                    <YAxis
+                      {...chartConfig.yAxisConfig}
+                      tickFormatter={(value) => chartConfig.formatLargeNumber(value)}
+                      domain={['auto', 'auto']} // Allow chart to determine appropriate range
                     />
                     <Tooltip content={<CustomTooltip />} />
-                    <Legend 
+                    <Legend
                       formatter={(value) => {
                         const parts = value.split('_');
                         if (parts.length === 2) {
@@ -471,20 +462,21 @@ const CurrencyAnalysis = () => {
                         }
                         return <span style={{ color: colors.text }}>{value}</span>;
                       }}
+                      wrapperStyle={{ paddingTop: 10 }}
                     />
                     {selectedCurrencies.map(curr => (
-                      <Line 
+                      <Line
                         key={`payment-line-${curr}`}
-                        type="monotone" 
-                        dataKey={`payment_${curr}`} 
-                        name={`payment_${curr}`} 
+                        type="monotone"
+                        dataKey={`payment_${curr}`}
+                        name={`payment_${curr}`}
                         stroke={currencyColors[curr]}
                         strokeWidth={2}
-                        dot={{ 
+                        dot={{
                           fill: currencyColors[curr],
                           r: 4
                         }}
-                        activeDot={{ 
+                        activeDot={{
                           fill: currencyColors[curr],
                           r: 6,
                           stroke: colors.background
@@ -493,31 +485,26 @@ const CurrencyAnalysis = () => {
                     ))}
                   </LineChart>
                 ) : (
-                  <LineChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
+                  <LineChart data={chartData} margin={chartConfig.margin}>
                     <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} />
-                    <XAxis 
-                      dataKey="year" 
-                      tick={{ fill: colors.text }} 
-                      stroke={colors.grid}
-                      label={{ 
-                        value: 'Year', 
-                        position: 'insideBottom', 
-                        offset: -5, 
-                        fill: colors.text 
-                      }}
+                    <XAxis
+                      dataKey="year"
+                      {...chartConfig.xAxisConfig}
                     />
-                    <YAxis 
-                      tick={{ fill: colors.text }} 
-                      stroke={colors.grid}
-                      label={{ 
-                        value: 'Exchange Rate', 
-                        angle: -90, 
-                        position: 'insideLeft', 
-                        fill: colors.text 
+                    <YAxis
+                      {...chartConfig.yAxisConfig}
+                      tickFormatter={(value) => value.toFixed(2)}
+                      label={{
+                        value: 'Rate',
+                        angle: -90,
+                        position: 'insideLeft',
+                        offset: 0,
+                        fill: colors.text
                       }}
+                      domain={['auto', 'auto']} // Allow chart to determine appropriate range
                     />
                     <Tooltip content={<CustomTooltip />} />
-                    <Legend 
+                    <Legend
                       formatter={(value) => {
                         const parts = value.split('_');
                         if (parts.length === 2) {
@@ -525,22 +512,23 @@ const CurrencyAnalysis = () => {
                         }
                         return <span style={{ color: colors.text }}>{value}</span>;
                       }}
+                      wrapperStyle={{ paddingTop: 10 }}
                     />
                     {selectedCurrencies
                       .filter(curr => curr !== currencyParams.baseCurrency)
                       .map(curr => (
-                        <Line 
+                        <Line
                           key={`rate-line-${curr}`}
-                          type="monotone" 
-                          dataKey={`rate_${curr}`} 
-                          name={`rate_${curr}`} 
+                          type="monotone"
+                          dataKey={`rate_${curr}`}
+                          name={`rate_${curr}`}
                           stroke={currencyColors[curr]}
                           strokeWidth={2}
-                          dot={{ 
+                          dot={{
                             fill: currencyColors[curr],
                             r: 4
                           }}
-                          activeDot={{ 
+                          activeDot={{
                             fill: currencyColors[curr],
                             r: 6,
                             stroke: colors.background
@@ -552,13 +540,13 @@ const CurrencyAnalysis = () => {
               </ResponsiveContainer>
             </div>
           </div>
-          
-          {/* Annual Data Table */}
+
+          {/* Annual Data Table with improved number formatting */}
           <div className={`p-4 rounded shadow ${darkMode ? 'bg-[#141418]' : 'bg-white border border-gray-200'}`}>
             <h2 className={`text-lg font-semibold mb-4 ${darkMode ? 'text-[#BF9FFB]' : 'text-purple-600'}`}>
               {chartType === 'payments' ? 'Annual Payment Data' : 'Annual Exchange Rate Data'}
             </h2>
-            
+
             <div className="overflow-x-auto">
               <table className="min-w-full">
                 <thead>
@@ -569,8 +557,8 @@ const CurrencyAnalysis = () => {
                     {chartType === 'payments' ? (
                       // Payment columns
                       selectedCurrencies.map(curr => (
-                        <th 
-                          key={`header-payment-${curr}`} 
+                        <th
+                          key={`header-payment-${curr}`}
                           className={`p-2 text-right ${darkMode ? 'text-[#D1D4DC] border-b border-[#2A2E39]' : 'text-gray-600 border-b border-gray-200'}`}
                           style={{ color: currencyColors[curr] }}
                         >
@@ -582,8 +570,8 @@ const CurrencyAnalysis = () => {
                       selectedCurrencies
                         .filter(curr => curr !== currencyParams.baseCurrency)
                         .map(curr => (
-                          <th 
-                            key={`header-rate-${curr}`} 
+                          <th
+                            key={`header-rate-${curr}`}
                             className={`p-2 text-right ${darkMode ? 'text-[#D1D4DC] border-b border-[#2A2E39]' : 'text-gray-600 border-b border-gray-200'}`}
                             style={{ color: currencyColors[curr] }}
                           >
@@ -600,10 +588,10 @@ const CurrencyAnalysis = () => {
                         {item.year}
                       </td>
                       {chartType === 'payments' ? (
-                        // Payment values
+                        // Payment values with proper currency formatting
                         selectedCurrencies.map(curr => (
-                          <td 
-                            key={`data-payment-${curr}-${item.year}`} 
+                          <td
+                            key={`data-payment-${curr}-${item.year}`}
                             className={`p-2 text-right ${darkMode ? 'text-white border-b border-[#2A2E39]' : 'text-gray-800 border-b border-gray-200'}`}
                           >
                             {formatCurrency(item[`payment_${curr}`] || 0, curr)}
@@ -614,8 +602,8 @@ const CurrencyAnalysis = () => {
                         selectedCurrencies
                           .filter(curr => curr !== currencyParams.baseCurrency)
                           .map(curr => (
-                            <td 
-                              key={`data-rate-${curr}-${item.year}`} 
+                            <td
+                              key={`data-rate-${curr}-${item.year}`}
                               className={`p-2 text-right ${darkMode ? 'text-white border-b border-[#2A2E39]' : 'text-gray-800 border-b border-gray-200'}`}
                             >
                               {item[`rate_${curr}`]?.toFixed(4) || '—'}

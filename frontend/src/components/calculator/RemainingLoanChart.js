@@ -1,14 +1,14 @@
 import React, { useContext } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { CurrencyContext } from '../../contexts/CurrencyContext';
-import { getChartConfig } from '../../utils/chartConfig'; // Импорт конфигурации
+import { getChartConfig } from '../../utils/chartConfig';
 
 const RemainingLoanChart = ({ scheduleData, darkMode }) => {
   const { formatCurrency, getCurrencySymbol } = useContext(CurrencyContext);
+  const chartConfig = getChartConfig(darkMode);
   const currencySymbol = getCurrencySymbol();
-  const chartConfig = getChartConfig(darkMode); // Получение конфигурации с учетом темной темы
 
-  // Подготовка данных для графика (оставить существующий код)
+  // Prepare chart data
   const chartData = scheduleData
     .filter((_, index) => index % 12 === 0 || index === scheduleData.length - 1)
     .map(item => ({
@@ -17,7 +17,7 @@ const RemainingLoanChart = ({ scheduleData, darkMode }) => {
       year: Math.ceil(item.month / 12)
     }));
 
-  // Цветовая схема (оставить существующий код)
+  // Color scheme
   const colors = darkMode ? {
     line: '#BF9FFB',
     dot: '#BF9FFB',
@@ -34,17 +34,15 @@ const RemainingLoanChart = ({ scheduleData, darkMode }) => {
     grid: '#e5e7eb'
   };
 
-  // Пользовательская подсказка (оставить существующий код)
+  // Custom tooltip
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       return (
-        <div className={`p-2 border rounded shadow ${darkMode ? 'bg-[#141418] border-[#2A2E39]' : 'bg-white border-gray-200'}`}>
-          <p className="text-sm font-medium">Year {label}</p>
-          {payload.map((entry, index) => (
-            <p key={index} className="text-sm" style={{ color: entry.color }}>
-              Remaining Balance: {formatCurrency(entry.value)}
-            </p>
-          ))}
+        <div className={`p-3 border rounded shadow ${darkMode ? 'bg-[#141418] border-[#2A2E39]' : 'bg-white border-gray-200'}`}>
+          <p className="text-sm font-medium mb-2">Year {label}</p>
+          <p className="text-sm">
+            Remaining Balance: {currencySymbol}{payload[0].value.toLocaleString()}
+          </p>
         </div>
       );
     }
@@ -58,32 +56,35 @@ const RemainingLoanChart = ({ scheduleData, darkMode }) => {
       </h3>
       <div className="h-80 md:h-96">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={chartData} margin={chartConfig.margin}>
+          <LineChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} />
             <XAxis
               dataKey="year"
-              {...chartConfig.xAxisConfig}
+              tick={{ fill: colors.text }}
+              stroke={colors.grid}
             />
             <YAxis
-              {...chartConfig.yAxisConfig}
-              tickFormatter={chartConfig.formatLargeNumber}
-              label={chartConfig.getCurrencyLabel(currencySymbol)}
+              tick={{ fill: colors.text }}
+              stroke={colors.grid}
+              tickFormatter={(value) => chartConfig.formatValue(value)}
+              domain={[0, 'auto']}
             />
             <Tooltip content={<CustomTooltip />} />
-            <Line 
-              type="monotone" 
-              dataKey="remainingLoan" 
+            <Line
+              type="monotone"
+              dataKey="remainingLoan"
               stroke={colors.line}
               strokeWidth={2}
-              dot={{ 
+              dot={{
                 fill: colors.dot,
                 r: 4
               }}
-              activeDot={{ 
+              activeDot={{
                 fill: colors.line,
                 r: 6,
                 stroke: colors.activeDot
               }}
+              animationDuration={800}
             />
           </LineChart>
         </ResponsiveContainer>

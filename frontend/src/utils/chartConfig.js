@@ -9,6 +9,19 @@ export const getChartConfig = (darkMode) => {
     grid: '#e5e7eb'
   };
 
+  // Определяем функцию форматирования больших чисел
+  const formatLargeNumber = (value) => {
+    if (value >= 1000000) {
+      return `${(value / 1000000).toFixed(1)}M`;
+    } else if (value >= 1000) {
+      return `${(value / 1000).toFixed(0)}K`;
+    }
+    return value;
+  };
+
+  // Определяем функцию formatValue как алиас для formatLargeNumber
+  const formatValue = formatLargeNumber;
+
   return {
     // Отступы графика
     margin: { top: 20, right: 20, left: 20, bottom: 30 },
@@ -34,15 +47,9 @@ export const getChartConfig = (darkMode) => {
       width: 60,
     },
 
-    // Форматирование больших чисел
-    formatLargeNumber: (value) => {
-      if (value >= 1000000) {
-        return `${(value / 1000000).toFixed(1)}M`;
-      } else if (value >= 1000) {
-        return `${(value / 1000).toFixed(0)}K`;
-      }
-      return value;
-    },
+    // Функции форматирования теперь доступны в возвращаемом объекте
+    formatLargeNumber,
+    formatValue,
 
     // Конфигурация для отображения символа валюты
     getCurrencyLabel: (currencySymbol) => ({

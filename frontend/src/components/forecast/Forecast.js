@@ -5,11 +5,13 @@ import { forecastPropertyValue } from '../../api';
 import InputField from '../common/InputField';
 import Loader from '../common/Loader';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { getChartConfig } from '../../utils/chartConfig';
 
 const Forecast = () => {
   const { darkMode } = useContext(AppContext);
   const { formatCurrency, getCurrencySymbol } = useContext(CurrencyContext);
-  
+  const chartConfig = getChartConfig(darkMode);
+
   // State for forecast parameters
   const [forecastParams, setForecastParams] = useState({
     initialValue: 10000000,
@@ -20,7 +22,7 @@ const Forecast = () => {
     regionalAdjustment: 0.0,
     seasonalFactors: null // Will use default seasonal factors from API
   });
-  
+
   // State for forecast results
   const [forecastResults, setForecastResults] = useState({
     forecast: [],
@@ -29,18 +31,18 @@ const Forecast = () => {
     totalGrowth: 0,
     realGrowth: 0
   });
-  
+
   // Loading and error states
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  
+
   // Calculate forecast when parameters change
   useEffect(() => {
     const getForecast = async () => {
       try {
         setIsLoading(true);
         setError(null);
-        
+
         const result = await forecastPropertyValue(forecastParams);
         setForecastResults(result);
       } catch (err) {
@@ -50,10 +52,10 @@ const Forecast = () => {
         setIsLoading(false);
       }
     };
-    
+
     getForecast();
   }, [forecastParams]);
-  
+
   // Handle input changes
   const handleInputChange = (name, value) => {
     setForecastParams(prev => ({
@@ -61,7 +63,7 @@ const Forecast = () => {
       [name]: value
     }));
   };
-  
+
   // Prepare chart data - sample every 12 months for clarity
   const chartData = forecastResults.forecast
     ? forecastResults.forecast
@@ -73,7 +75,7 @@ const Forecast = () => {
           realValue: item.realValue
         }))
     : [];
-  
+
   // Color scheme
   const colors = darkMode ? {
     nominal: '#BF9FFB',    // Purple
@@ -88,16 +90,17 @@ const Forecast = () => {
     text: '#374151',       // Dark text
     grid: '#e5e7eb'        // Grid lines
   };
-  
-  // Custom tooltip
+
+  // Custom tooltip with proper formatting
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
+      const currencySymbol = getCurrencySymbol();
       return (
-        <div className={`p-2 border rounded shadow ${darkMode ? 'bg-[#141418] border-[#2A2E39]' : 'bg-white border-gray-200'}`}>
-          <p className="text-sm font-medium">Year {label}</p>
+        <div className={`p-3 border rounded shadow ${darkMode ? 'bg-[#141418] border-[#2A2E39]' : 'bg-white border-gray-200'}`}>
+          <p className="text-sm font-medium mb-2">Year {label}</p>
           {payload.map((entry, index) => (
-            <p key={index} className="text-sm" style={{ color: entry.color }}>
-              {entry.name}: {formatCurrency(entry.value)}
+            <p key={index} className="text-sm mb-1" style={{ color: entry.color }}>
+              {entry.name}: {currencySymbol}{entry.value.toLocaleString()}
             </p>
           ))}
         </div>
@@ -105,19 +108,19 @@ const Forecast = () => {
     }
     return null;
   };
-  
+
   return (
     <div className="max-w-6xl mx-auto">
       <h1 className={`text-2xl font-bold mb-6 ${darkMode ? 'text-[#BF9FFB]' : 'text-purple-600'}`}>
         Property Value Forecast
       </h1>
-      
+
       {/* Input Form */}
       <div className={`p-4 rounded shadow mb-6 ${darkMode ? 'bg-[#141418]' : 'bg-white border border-gray-200'}`}>
         <h2 className={`text-lg font-semibold mb-4 ${darkMode ? 'text-[#BF9FFB]' : 'text-purple-600'}`}>
           Forecast Parameters
         </h2>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <InputField
             label="Initial Property Value"
@@ -126,7 +129,7 @@ const Forecast = () => {
             prefix={getCurrencySymbol()}
             darkMode={darkMode}
           />
-          
+
           <InputField
             label="Annual Growth Rate (%)"
             value={forecastParams.growthRate}
@@ -137,7 +140,7 @@ const Forecast = () => {
             min="-10"
             max="30"
           />
-          
+
           <InputField
             label="Forecast Period (years)"
             value={forecastParams.years}
@@ -149,7 +152,7 @@ const Forecast = () => {
             max="30"
             type="number"
           />
-          
+
           <InputField
             label="Annual Inflation Rate (%)"
             value={forecastParams.inflationRate}
@@ -160,7 +163,7 @@ const Forecast = () => {
             min="0"
             max="30"
           />
-          
+
           <InputField
             label="Regional Adjustment (%)"
             value={forecastParams.regionalAdjustment}
@@ -171,7 +174,7 @@ const Forecast = () => {
             min="-10"
             max="10"
           />
-          
+
           <div>
             <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-[#D1D4DC]' : 'text-gray-700'}`}>
               Forecast Model
@@ -192,20 +195,20 @@ const Forecast = () => {
           </div>
         </div>
       </div>
-      
+
       {/* Loading and Error States */}
       {isLoading && (
         <div className="flex justify-center my-8">
           <Loader />
         </div>
       )}
-      
+
       {error && (
         <div className={`p-4 mb-6 rounded ${darkMode ? 'bg-red-900' : 'bg-red-100 border border-red-400'}`}>
           <p className={darkMode ? 'text-red-200' : 'text-red-700'}>{error}</p>
         </div>
       )}
-      
+
       {/* Results Section */}
       {!isLoading && !error && forecastResults.forecast && forecastResults.forecast.length > 0 && (
         <>
@@ -213,7 +216,7 @@ const Forecast = () => {
             <h2 className={`text-lg font-semibold mb-4 ${darkMode ? 'text-[#BF9FFB]' : 'text-purple-600'}`}>
               Forecast Results
             </h2>
-            
+
             {/* Results Summary */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
               <div className={`p-4 rounded ${darkMode ? 'bg-[#0D1015] border border-[#2A2E39]' : 'bg-gray-50 border border-gray-200'}`}>
@@ -221,88 +224,81 @@ const Forecast = () => {
                   Projected Nominal Value
                 </div>
                 <div className={`text-xl font-semibold ${darkMode ? 'text-[#BF9FFB]' : 'text-purple-600'}`}>
-                  {formatCurrency(forecastResults.finalNominalValue)}
+                  {getCurrencySymbol()}{forecastResults.finalNominalValue.toLocaleString()}
                 </div>
                 <div className={`text-sm ${forecastResults.totalGrowth >= 0 ? (darkMode ? 'text-[#74F174]' : 'text-green-500') : (darkMode ? 'text-[#FAA1A4]' : 'text-red-500')}`}>
                   {forecastResults.totalGrowth >= 0 ? '+' : ''}{(forecastResults.totalGrowth * 100).toFixed(1)}%
                 </div>
               </div>
-              
+
               <div className={`p-4 rounded ${darkMode ? 'bg-[#0D1015] border border-[#2A2E39]' : 'bg-gray-50 border border-gray-200'}`}>
                 <div className={`text-sm mb-1 ${darkMode ? 'text-[#D1D4DC]' : 'text-gray-500'}`}>
                   Projected Real Value (Inflation-Adjusted)
                 </div>
                 <div className={`text-xl font-semibold ${darkMode ? 'text-[#BF9FFB]' : 'text-purple-600'}`}>
-                  {formatCurrency(forecastResults.finalRealValue)}
+                  {getCurrencySymbol()}{forecastResults.finalRealValue.toLocaleString()}
                 </div>
                 <div className={`text-sm ${forecastResults.realGrowth >= 0 ? (darkMode ? 'text-[#74F174]' : 'text-green-500') : (darkMode ? 'text-[#FAA1A4]' : 'text-red-500')}`}>
                   {forecastResults.realGrowth >= 0 ? '+' : ''}{(forecastResults.realGrowth * 100).toFixed(1)}%
                 </div>
               </div>
             </div>
-            
-            {/* Forecast Chart */}
+
+            {/* Forecast Chart with improved formatting */}
             <div>
               <h3 className={`text-md font-medium mb-2 ${darkMode ? 'text-[#D1D4DC]' : 'text-gray-700'}`}>
                 Property Value Projection
               </h3>
               <div className="h-64 md:h-80">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
+                  <LineChart data={chartData} margin={chartConfig.margin}>
                     <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} />
-                    <XAxis 
-                      dataKey="year" 
-                      tick={{ fill: colors.text }} 
-                      stroke={colors.grid}
-                      label={{ 
-                        value: 'Year', 
-                        position: 'insideBottom', 
-                        offset: -5, 
-                        fill: colors.text 
-                      }}
+                    <XAxis
+                      dataKey="year"
+                      {...chartConfig.xAxisConfig}
                     />
-                    <YAxis 
-                      tick={{ fill: colors.text }} 
-                      stroke={colors.grid}
-                      label={{ 
-                        value: getCurrencySymbol(), 
-                        angle: -90, 
-                        position: 'insideLeft', 
-                        fill: colors.text 
-                      }}
+                    <YAxis
+                      {...chartConfig.yAxisConfig}
+                      tickFormatter={(value) => chartConfig.formatLargeNumber(value)}
+                      domain={[0, 'auto']} // Ensure y-axis starts at 0
                     />
                     <Tooltip content={<CustomTooltip />} />
-                    <Legend 
-                      formatter={(value) => <span style={{ color: colors.text }}>{value}</span>}
+                    <Legend
+                      formatter={(value) => (
+                        <span style={{ color: colors.text }}>
+                          {value === 'nominalValue' ? 'Nominal Value' : 'Real Value (Inflation-Adjusted)'}
+                        </span>
+                      )}
+                      wrapperStyle={{ paddingTop: 10 }}
                     />
-                    <Line 
-                      type="monotone" 
-                      dataKey="nominalValue" 
-                      name="Nominal Value" 
+                    <Line
+                      type="monotone"
+                      dataKey="nominalValue"
+                      name="Nominal Value"
                       stroke={colors.nominal}
                       strokeWidth={2}
-                      dot={{ 
+                      dot={{
                         fill: colors.nominal,
                         r: 4
                       }}
-                      activeDot={{ 
+                      activeDot={{
                         fill: colors.nominal,
                         r: 6,
                         stroke: colors.background
                       }}
                     />
-                    <Line 
-                      type="monotone" 
-                      dataKey="realValue" 
-                      name="Real Value (Inflation-Adjusted)" 
+                    <Line
+                      type="monotone"
+                      dataKey="realValue"
+                      name="Real Value (Inflation-Adjusted)"
                       stroke={colors.real}
                       strokeWidth={2}
                       strokeDasharray="5 5"
-                      dot={{ 
+                      dot={{
                         fill: colors.real,
                         r: 4
                       }}
-                      activeDot={{ 
+                      activeDot={{
                         fill: colors.real,
                         r: 6,
                         stroke: colors.background
@@ -313,8 +309,8 @@ const Forecast = () => {
               </div>
             </div>
           </div>
-          
-          {/* Annual Data Table */}
+
+          {/* Annual Data Table with proper formatting */}
           <div className={`p-4 rounded shadow ${darkMode ? 'bg-[#141418]' : 'bg-white border border-gray-200'}`}>
             <h2 className={`text-lg font-semibold mb-4 ${darkMode ? 'text-[#BF9FFB]' : 'text-purple-600'}`}>
               Annual Forecast Data

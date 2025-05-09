@@ -1,14 +1,14 @@
 import React, { useContext } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { CurrencyContext } from '../../contexts/CurrencyContext';
-import { getChartConfig } from '../../utils/chartConfig'; // Импорт конфигурации
+import { getChartConfig } from '../../utils/chartConfig';
 
 const PaymentChart = ({ scheduleData, darkMode }) => {
   const { formatCurrency, getCurrencySymbol } = useContext(CurrencyContext);
+  const chartConfig = getChartConfig(darkMode);
   const currencySymbol = getCurrencySymbol();
-  const chartConfig = getChartConfig(darkMode); // Получение конфигурации с учетом темной темы
 
-  // Подготовка данных для графика (оставить существующий код)
+  // Prepare chart data
   const chartData = scheduleData
     .filter((_, index) => index % 12 === 0 || index === scheduleData.length - 1)
     .map(item => ({
@@ -20,7 +20,7 @@ const PaymentChart = ({ scheduleData, darkMode }) => {
       year: Math.ceil(item.month / 12)
     }));
 
-  // Цветовая схема (оставить существующий код)
+  // Color scheme
   const colors = darkMode ? {
     principal: '#BF9FFB',
     interest: '#90BFF9',
@@ -35,19 +35,19 @@ const PaymentChart = ({ scheduleData, darkMode }) => {
     grid: '#e5e7eb'
   };
 
-  // Пользовательская подсказка (оставить существующий код)
+  // Custom tooltip
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       return (
-        <div className={`p-2 border rounded shadow ${darkMode ? 'bg-[#141418] border-[#2A2E39]' : 'bg-white border-gray-200'}`}>
-          <p className="text-sm font-medium">Year {label}</p>
+        <div className={`p-3 border rounded shadow ${darkMode ? 'bg-[#141418] border-[#2A2E39]' : 'bg-white border-gray-200'}`}>
+          <p className="text-sm font-medium mb-2">Year {label}</p>
           {payload.map((entry, index) => (
-            <p key={index} className="text-sm" style={{ color: entry.color }}>
-              {entry.name}: {formatCurrency(entry.value)}
+            <p key={index} className="text-sm mb-1" style={{ color: entry.color }}>
+              {entry.name === 'principal' ? 'Principal' : 'Interest'}: {currencySymbol}{entry.value.toLocaleString()}
             </p>
           ))}
           <p className="text-sm font-medium mt-1">
-            Total: {formatCurrency(payload[0].payload.payment)}
+            Total: {currencySymbol}{(payload[0].payload.payment).toLocaleString()}
           </p>
         </div>
       );
@@ -62,33 +62,39 @@ const PaymentChart = ({ scheduleData, darkMode }) => {
       </h3>
       <div className="h-80 md:h-96">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={chartData} margin={chartConfig.margin}>
+          <BarChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} />
             <XAxis
               dataKey="year"
-              {...chartConfig.xAxisConfig}
+              tick={{ fill: colors.text }}
+              stroke={colors.grid}
             />
             <YAxis
-              {...chartConfig.yAxisConfig}
-              tickFormatter={chartConfig.formatLargeNumber}
-              label={chartConfig.getCurrencyLabel(currencySymbol)}
+              tick={{ fill: colors.text }}
+              stroke={colors.grid}
+              tickFormatter={(value) => chartConfig.formatValue(value)}
             />
             <Tooltip content={<CustomTooltip />} />
             <Legend
-              formatter={(value) => <span style={{ color: colors.text }}>{value}</span>}
-              wrapperStyle={{ paddingTop: '20px' }}
+              formatter={(value) => (
+                <span style={{ color: colors.text }}>
+                  {value === 'principal' ? 'Principal' : 'Interest'}
+                </span>
+              )}
             />
-            <Bar 
-              dataKey="principal" 
-              name="Principal" 
-              stackId="a" 
-              fill={colors.principal} 
+            <Bar
+              dataKey="principal"
+              name="principal"
+              stackId="a"
+              fill={colors.principal}
+              animationDuration={500}
             />
-            <Bar 
-              dataKey="interest" 
-              name="Interest" 
-              stackId="a" 
-              fill={colors.interest} 
+            <Bar
+              dataKey="interest"
+              name="interest"
+              stackId="a"
+              fill={colors.interest}
+              animationDuration={500}
             />
           </BarChart>
         </ResponsiveContainer>
