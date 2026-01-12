@@ -22,6 +22,9 @@ from backend.core.scenarios import (
     calculate_with_insurance,
     calculate_with_central_bank_rate
 )
+from backend.core.ai.chatbot import MortgageAdvisorChatbot
+from backend.core.ai.recommender import ScenarioRecommender
+from backend.core.ai.expense_analyzer import ExpenseAnalyzer
 
 def create_app():
     # Initialize the application
@@ -532,6 +535,75 @@ def create_app():
             })
         except Exception as e:
             return jsonify({'error': f'Server error: {str(e)}'}), 500
+    
+    # AI Endpoints
+    @app.route('/api/ai/chat', methods=['POST'])
+    def ai_chat():
+        """AI Chatbot endpoint for mortgage advice"""
+        try:
+            data = request.json
+            user_message = data.get('message', '')
+            calculator_data = data.get('calculator_data', {})
+            
+            if not user_message:
+                return jsonify({'error': 'Message is required'}), 400
+            
+            chatbot = MortgageAdvisorChatbot()
+            response = chatbot.chat(user_message, calculator_data)
+            
+            return jsonify({
+                'response': response,
+                'success': True
+            })
+        except Exception as e:
+            return jsonify({'error': f'Server error: {str(e)}', 'success': False}), 500
+    
+    @app.route('/api/ai/recommend', methods=['POST'])
+    def ai_recommend():
+        """AI Scenario Recommendations endpoint"""
+        try:
+            data = request.json
+            user_profile = data.get('user_profile', {})
+            
+            if not user_profile:
+                return jsonify({'error': 'User profile is required'}), 400
+            
+            recommender = ScenarioRecommender()
+            recommendations = recommender.recommend(user_profile)
+            
+            return jsonify({
+                'recommendations': recommendations,
+                'success': True
+            })
+        except Exception as e:
+            return jsonify({'error': f'Server error: {str(e)}', 'success': False}), 500
+    
+    @app.route('/api/ai/analyze-expenses', methods=['POST'])
+    def ai_analyze_expenses():
+        """AI Expense Analyzer endpoint"""
+        try:
+            data = request.json
+            text = data.get('text', '')
+            monthly_income = data.get('monthly_income', 0)
+            
+            if not text:
+                return jsonify({'error': 'Text description is required'}), 400
+            
+            analyzer = ExpenseAnalyzer()
+            expenses = analyzer.extract_expenses_from_text(text)
+            
+            # Calculate affordability if income provided
+            affordability = None
+            if monthly_income > 0:
+                affordability = analyzer.calculate_debt_to_income_ratio(monthly_income, expenses)
+            
+            return jsonify({
+                'expenses': expenses,
+                'affordability': affordability,
+                'success': True
+            })
+        except Exception as e:
+            return jsonify({'error': f'Server error: {str(e)}', 'success': False}), 500
             
     return app
 

@@ -12,6 +12,22 @@ A comprehensive, professional-grade mortgage calculator application featuring ad
 
 Experience the full application with all features and real-time calculations.
 
+## Features
+
+- **Basic Mortgage Calculations**: Calculate annuity and differentiated payment schedules with detailed visualization
+- **Property Value Forecasting**: Project property values over time with different growth models
+- **Rent vs. Buy Comparison**: Compare the financial implications of renting versus buying
+- **Currency Analysis**: Analyze mortgage payments in different currencies with exchange rate projections
+- **Advanced Scenarios**:
+  - Early Repayment: Calculate the impact of early payments on your mortgage
+  - Restructuring: Compare original mortgage terms with restructured options
+  - Insurance: Analyze how insurance costs affect total payments
+  - Central Bank Rate: See how changes in central bank rates affect variable-rate mortgages
+- **AI-Powered Features**:
+  - **Intelligent Mortgage Advisor Chatbot**: Get expert mortgage advice and answers to your questions using AI
+  - **Smart Scenario Recommendations**: AI analyzes your profile and recommends optimal mortgage parameters
+  - **Expense & Income Analyzer**: Automatically extract and categorize expenses from natural language descriptions
+
 ## 📖 Overview
 
 Mortgage Calculator Pro is a sophisticated financial planning tool designed for homebuyers, real estate professionals, and financial advisors. The application provides comprehensive mortgage analysis capabilities including payment calculations, property value forecasting, rent vs. buy comparisons, currency analysis, and advanced scenario modeling.

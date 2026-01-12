@@ -99,6 +99,47 @@ export const calculateCentralBankRateImpact = async (params) => {
   }
 };
 
+// AI Chatbot
+export const aiChat = async (message, calculatorData = {}) => {
+  try {
+    const response = await api.post('/ai/chat', {
+      message,
+      calculator_data: calculatorData,
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error with AI chat:', error);
+    throw error;
+  }
+};
+
+// AI Recommendations
+export const aiRecommend = async (userProfile) => {
+  try {
+    const response = await api.post('/ai/recommend', {
+      user_profile: userProfile,
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error getting AI recommendations:', error);
+    throw error;
+  }
+};
+
+// AI Expense Analyzer
+export const aiAnalyzeExpenses = async (text, monthlyIncome = 0) => {
+  try {
+    const response = await api.post('/ai/analyze-expenses', {
+      text,
+      monthly_income: monthlyIncome,
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error analyzing expenses:', error);
+    throw error;
+  }
+};
+
 export default {
   calculateMortgage,
   forecastPropertyValue,
@@ -108,4 +149,7 @@ export default {
   calculateRestructuring,
   calculateInsuranceImpact,
   calculateCentralBankRateImpact,
+  aiChat,
+  aiRecommend,
+  aiAnalyzeExpenses,
 };

@@ -13,6 +13,7 @@ import Forecast from './components/forecast/Forecast';
 import RentVsBuy from './components/comparison/RentVsBuy';
 import CurrencyAnalysis from './components/currency/CurrencyAnalysis';
 import Scenarios from './components/scenarios/Scenarios';
+import AI from './components/ai/AI';
 
 // Contexts
 import { AppProvider } from './contexts/AppContext';
@@ -33,6 +34,8 @@ function App() {
         return <CurrencyAnalysis />;
       case 'scenarios':
         return <Scenarios />;
+      case 'ai':
+        return <AI />;
       default:
         return <Calculator />;
     }

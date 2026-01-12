@@ -38,6 +38,14 @@ const ScenariosIcon = () => (
   </svg>
 );
 
+const AIIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+    <path d="M2 17l10 5 10-5"></path>
+    <path d="M2 12l10 5 10-5"></path>
+  </svg>
+);
+
 const Sidebar = ({ activeTab, setActiveTab }) => {
   const { darkMode } = useContext(AppContext);
 
@@ -46,7 +54,8 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
     { id: 'forecast', name: 'Forecast', icon: <ChartIcon /> },
     { id: 'comparison', name: 'Rent vs Buy', icon: <ComparisonIcon /> },
     { id: 'currency', name: 'Currency', icon: <CurrencyIcon /> },
-    { id: 'scenarios', name: 'Scenarios', icon: <ScenariosIcon /> }
+    { id: 'scenarios', name: 'Scenarios', icon: <ScenariosIcon /> },
+    { id: 'ai', name: 'AI Assistant', icon: <AIIcon /> }
   ];
 
   return (
